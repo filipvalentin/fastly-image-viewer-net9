@@ -1,46 +1,46 @@
-﻿<Window x:Class="Fastly_Image_Viewer.MainWindow"
+﻿<Window x:Class="fastly_image_viewer_net9.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:c="clr-namespace:Fastly_Image_Viewer.Controls"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Fastly_Image_Viewer"
-        mc:Ignorable="d"
-        WindowStyle="None"
+        xmlns:c="clr-namespace:fastly_image_viewer_net9.Controls"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:fastly_image_viewer_net9"
+		mc:Ignorable="d"
+		WindowStyle="None"
         WindowState="Maximized"
         Width="1024" Height="768"
         AllowsTransparency="True"
         Background="#7F000000"
         AllowDrop="True"
         Closing="Window_Closing" MouseWheel="Window_MouseWheel" Drop="Window_Drop">
-    <Window.Resources>
-        <!-- ToolTip Style -->
-        <Style TargetType="ToolTip">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ToolTip">
-                        <Grid>
-                            <Border 
+	<Window.Resources>
+		<!-- ToolTip Style -->
+		<Style TargetType="ToolTip">
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="ToolTip">
+						<Grid>
+							<Border 
                                 Background="#7F000000"
                                 BorderBrush="#BF191919"
                                 BorderThickness="1">
-                                <Label
+								<Label
                                     Foreground="#99FFFFFF"
                                     Content="{TemplateBinding Content}"/>
-                            </Border>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </Window.Resources>
-    <Grid
+							</Border>
+						</Grid>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+	</Window.Resources>
+	<Grid
         x:Name="mainGrid">
-        <Image
+		<Image
             x:Name="image"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"/>
-        <Button
+		<Button
             x:Name="openBtn"
             Style="{StaticResource NativeButtonWithShadowStyle}"
             Width="60" Height="40"
@@ -52,7 +52,7 @@
             Content="OPEN"
             Cursor="Hand"
             Click="openBtn_Click"/>
-        <Button
+		<Button
             x:Name="saveAsBtn"
             Style="{StaticResource NativeButtonWithShadowStyle}"
             Width="70" Height="40"
@@ -65,10 +65,10 @@
             IsEnabled="False"
             Cursor="Hand"
             Click="saveAsBtn_Click"/>
-        <Grid
+		<Grid
             HorizontalAlignment="Right"
             Margin="30">
-            <Button 
+			<Button 
                 x:Name="closeBtn"
                 Style="{StaticResource NativeButtonWithShadowStyle}"
                 Width="40" Height="40"
@@ -80,13 +80,13 @@
                 ToolTipService.BetweenShowDelay="0"
                 Cursor="Hand"
                 Click="closeBtn_Click">
-                <Path
+				<Path
                     Fill="{Binding ElementName=closeBtn, Path=Foreground}"
                     Width="16" Height="16"
                     Data="{StaticResource IconClose}"
                     Stretch="Fill"/>
-            </Button>
-            <Button
+			</Button>
+			<Button
                 x:Name="colorPickerBtn"
                 Style="{StaticResource NativeButtonWithShadowStyle}"
                 Width="40" Height="40"
@@ -99,13 +99,13 @@
                 ToolTipService.BetweenShowDelay="0"
                 Cursor="Hand"
                 IsEnabled="False">
-                <Path
+				<Path
                     Fill="{Binding ElementName=colorPickerBtn, Path=Foreground}"
                     Width="16" Height="16"
                     Data="{StaticResource IconColorPicker}"
                     Stretch="Fill"/>
-            </Button>
-            <Button
+			</Button>
+			<Button
                 x:Name="zoomInBtn"
                 Style="{StaticResource NativeButtonWithShadowStyle}"
                 Width="40" Height="40"
@@ -119,13 +119,13 @@
                 IsEnabled="False"
                 Cursor="Hand"
                 Click="zoomInBtn_Click">
-                <Path
+				<Path
                     Fill="{Binding ElementName=zoomInBtn, Path=Foreground}"
                     Width="20" Height="20"
                     Data="{StaticResource IconZoomPlus}"
                     Stretch="Fill"/>
-            </Button>
-            <Button
+			</Button>
+			<Button
                 x:Name="zoomReloadBtn"
                 Style="{StaticResource NativeButtonWithShadowStyle}"
                 Width="40" Height="40"
@@ -138,13 +138,13 @@
                 IsEnabled="False"
                 Cursor="Hand"
                 Click="zoomReloadBtn_Click">
-                <Path
+				<Path
                     Fill="{Binding ElementName=zoomReloadBtn, Path=Foreground}"
                     Width="20" Height="20"
                     Data="{StaticResource IconReload}"
                     Stretch="Fill"/>
-            </Button>
-            <Button
+			</Button>
+			<Button
                 x:Name="zoomOutBtn"
                 Style="{StaticResource NativeButtonWithShadowStyle}"
                 Width="40" Height="40"
@@ -158,13 +158,13 @@
                 IsEnabled="False"
                 Cursor="Hand"
                 Click="zoomOutBtn_Click">
-                <Path
+				<Path
                     Fill="{Binding ElementName=zoomOutBtn, Path=Foreground}"
                     Width="20" Height="20"
                     Data="{StaticResource IconZoomMinus}"
                     Stretch="Fill"/>
-            </Button>
-            <Button 
+			</Button>
+			<Button 
                 x:Name="settingsBtn"
                 Style="{StaticResource NativeButtonWithShadowStyle}"
                 Width="40" Height="40"
@@ -176,13 +176,13 @@
                 ToolTipService.ShowDuration="2500"
                 ToolTipService.BetweenShowDelay="0"
                 Cursor="Hand">
-                <Path
+				<Path
                     Fill="{Binding ElementName=settingsBtn, Path=Foreground}"
                     Width="22" Height="22"
                     Data="{StaticResource IconSettings}"
                     Stretch="Fill"/>
-            </Button>
-            <Button
+			</Button>
+			<Button
                 x:Name="infoBtn"
                 Style="{StaticResource NativeButtonWithShadowStyle}"
                 Width="40" Height="40"
@@ -193,26 +193,26 @@
                 ToolTipService.ShowDuration="2500"
                 ToolTipService.BetweenShowDelay="0"
                 Cursor="Hand">
-                <Path
+				<Path
                     Fill="{Binding ElementName=infoBtn, Path=Foreground}"
                     Width="22" Height="22"
                     Data="{StaticResource IconInfo}"
                     Stretch="Fill"/>
-            </Button>
-        </Grid>
-        <Grid
+			</Button>
+		</Grid>
+		<Grid
             x:Name="grid"
             Width="300" Height="300"
             HorizontalAlignment="Center"
             VerticalAlignment="Center">
-            <Label
+			<Label
                 Foreground="#FFF5F5F5"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 FontFamily="Segoe UI Light"
                 FontSize="18"
                 Content="NO IMAGE CONTENT"/>
-            <c:ClickableTextBlock
+			<!--<c:ClickableTextBlock
                 Style="{StaticResource LinkTextBlock}"
                 Foreground="#FFD1D1D1"
                 ClickForeground="White"
@@ -223,9 +223,9 @@
                 FontSize="18"
                 Text="OPEN"
                 Click="openBtn_Click"
-                Cursor="Hand"/>
-        </Grid>
-        <Label
+                Cursor="Hand"/>-->
+		</Grid>
+		<Label
             x:Name="infoLbl"
             Foreground="#FFBDBDBD"
             HorizontalAlignment="Left"
@@ -235,12 +235,12 @@
             FontSize="14" 
             Visibility="Hidden"
             Content=":File name&#xA;:File size&#xA;:Size"/>
-        <Label
+		<Label
             x:Name="infoLbl2"
             Foreground="#FFCBCBCB"
             HorizontalAlignment="Left"
             VerticalAlignment="Bottom"
             Margin="100, 30"
             FontSize="16"/>
-    </Grid>
+	</Grid>
 </Window>

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Win32;
 using System.Windows;
 
-namespace Fastly_Image_Viewer
+namespace fastly_image_viewer_net9
 {
     public partial class SettingsWindow : Window
     {

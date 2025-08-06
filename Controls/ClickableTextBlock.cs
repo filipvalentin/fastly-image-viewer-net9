@@ -4,7 +4,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace Fastly_Image_Viewer.Controls
+namespace fastly_image_viewer_net9.Controls
 {
     class ClickableTextBlock : TextBlock
     {

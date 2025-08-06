@@ -1,25 +1,29 @@
-# Fastly Image Viewer
-Fast and Simple open source image viewer written on C# under the [GNU General Public License v2.0](https://github.com/Rebzzel/Fastly-Image-Viewer/blob/master/LICENSE)
+# Fastly Image Viewer .NET9
+Fast and Simple open source image viewer written in .NET 9 WPF under the [GNU General Public License v2.0](https://github.com/Rebzzel/Fastly-Image-Viewer/blob/master/LICENSE)
 
-## Screenshots
-![Imgur](https://i.imgur.com/583QPlN.png)
+Forked for the sole purpose of creating a quick-to-develop, lightweight, image viewer that can finally open HEIC images without paying 1$ to Microsoft.
 
-## TODO
-- [x] User Interface Design (may be supplemented)
-- [x] Support simple image formats (jpeg, png, bmp and etc.)
-- [x] Arguments handler
-- [x] Zoom algorithms
-- [x] Installer (using [inno setup](https://github.com/jrsoftware/issrc))
-- [ ] Support Gifs
-- [x] Drag and drop 
-- [ ] Copy/Paste image from clipboard
-- [x] Scroll zoom control
+I'll update more things in this repo as time goes by.
 
-## How to Install?
-You can compile from source or install from [releases](https://github.com/Rebzzel/Fastly-Image-Viewer/releases) when available.
+## To Do
+ -[ ] Rewrite the UI.
+ -[ ] Expand zoom functionality 
+ -[ ] Installer / portable folder
+ -[ ] Improve performance / parallelize (The actual version seems slow)
 
-## Contributors
-[Rebzzel](https://github.com/Rebzzel)
 
-## Donate
-You can support project by donate on [Patreon](https://www.patreon.com/rebzzel).
+Target platforms: Windows 7 and above
+
+
+## Thanks to
+[Rebzzel](https://github.com/Rebzzel) - original repo author
+[Openize Pty Ltd](https://about.openize.com/) - Openize.HEIC NuGet Package authors
+
+
+## License
+
+This repository is a fork of [Fastly Image Viewer](https://github.com/Rebzzel/Fastly-Image-Viewer) which is licensed under the GNU General Public License v2.0.
+
+All modifications and this repository as a whole are distributed under the GPL-2.0 license. See [LICENSE](./LICENSE) for details.
+
+This project also uses third-party libraries, including Openize.HEIC, licensed under a BSD 2-Clause derived license with a patent clause. Please see [THIRD_PARTY_LICENSES.md](./THIRD_PARTY_LICENSES) for more information.

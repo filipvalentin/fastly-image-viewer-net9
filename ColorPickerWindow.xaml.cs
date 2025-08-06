@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace Fastly_Image_Viewer
+namespace fastly_image_viewer_net9
 {
     public partial class ColorPickerWindow : Window
     {
@@ -9,7 +9,7 @@ namespace Fastly_Image_Viewer
             InitializeComponent();
 
             titleLbl.MouseDown += (s, e) => DragMove();
-            closeLbl.Click += (s, e) => Hide();
+            //closeLbl.Click += (s, e) => Hide();
         }
     }
 }

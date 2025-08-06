@@ -6,10 +6,11 @@ Forked for the sole purpose of creating a quick-to-develop, lightweight, image v
 I'll update more things in this repo as time goes by.
 
 ## To Do
- -[ ] Rewrite the UI.
- -[ ] Expand zoom functionality 
- -[ ] Installer / portable folder
- -[ ] Improve performance / parallelize (The actual version seems slow)
+ - [x] It works! Clunkily, but it works!
+ - [ ] Rewrite the UI.
+ - [ ] Expand zoom functionality 
+ - [ ] Installer / portable folder
+ - [ ] Improve performance / parallelize (The actual version seems slow)
 
 
 Target platforms: Windows 7 and above

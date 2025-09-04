@@ -21,6 +21,18 @@ I'll update more things as time goes by, but be sure that the hate of paying for
  - **Install**: Someday I'll provide an installer.
  - **In both cases, the final step**: right click on a .heic file > Properties. On the "Opens with:" section click on `Change ...` button. Browse for ***fastly-image-viewer-net9.exe*** and click OK. Now the app will open your .heic files!
  
+ -[ ] Rewrite the UI & controls; fix windows
+ -[x] Expand zoom functionality 
+ -[ ] Installer / portable folder
+ -[x] Improve performance / parallelize 
+ 
+<br/>
+
+## How to
+ - **Build**: Just clone the repo. 
+ - **Install**: Someday I'll provide an installer.
+ - **In both cases, the final step**: right click on a .heic file > Properties. On the "Opens with:" section click on `Change ...` button. Browse for ***fastly-image-viewer-net9.exe*** and click OK. Now the app will open your .heic files!
+ 
 Target platforms: Windows 7 and above
 
 <br/>
@@ -28,10 +40,14 @@ Target platforms: Windows 7 and above
 ## Thanks to
 [Rebzzel](https://github.com/Rebzzel) - original repo author\
 [Openize Pty Ltd](https://about.openize.com/) - Openize.HEIC NuGet Package authors
+[Rebzzel](https://github.com/Rebzzel) - original repo author
+[Magick.NET](https://about.openize.com/) - Magick.NET NuGet Package authors (seriously, what unearthly optimization do you do to decode HEICs?)
 
 
 ### License
 
+All modifications and this repository as a whole are distributed under the GPL-3.0 license. See [LICENSE](./LICENSE) for details.
+
 This repository is a fork of [Fastly Image Viewer](https://github.com/Rebzzel/Fastly-Image-Viewer) which is licensed under the GNU General Public License v2.0.\
 All modifications and this repository as a whole are distributed under the GPL-2.0 license. See [LICENSE](./LICENSE) for details.\
-This project also uses third-party libraries, including Openize.HEIC, licensed under a BSD 2-Clause derived license with a patent clause. Please see [THIRD_PARTY_LICENSES](./THIRD_PARTY_LICENSES) for more information.
+This project also uses third-party libraries, including Magick.NET, licensed under a Apache 2 license-2.0. Please see [THIRD_PARTY_LICENSES.md](./THIRD_PARTY_LICENSES) for more information.

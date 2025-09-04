@@ -6,23 +6,24 @@
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:fastly_image_viewer_net9"
 		mc:Ignorable="d"
-		WindowStyle="None"
-        WindowState="Maximized"
-        Width="1024" Height="768"
-        AllowsTransparency="True"
-        Background="#7F000000"
+		MinHeight="320"
+		MinWidth="400"
+		WindowStyle="SingleBorderWindow"
+        SourceInitialized="Window_SourceInitialized"
+        Background="#2F2F2F"
         AllowDrop="True"
-        Closing="Window_Closing" MouseWheel="Window_MouseWheel" Drop="Window_Drop">
+        Closing="Window_Closing" Drop="Window_Drop" KeyDown="Window_KeyDown">
 	<Window.Resources>
 		<!-- ToolTip Style -->
 		<Style TargetType="ToolTip">
 			<Setter Property="Template">
 				<Setter.Value>
 					<ControlTemplate TargetType="ToolTip">
-						<Grid>
+						<Grid
+							Background="#2F2F2F">
 							<Border 
-                                Background="#7F000000"
-                                BorderBrush="#BF191919"
+                                Background="#2F2F2F"
+                                BorderBrush="#191919"
                                 BorderThickness="1">
 								<Label
                                     Foreground="#99FFFFFF"
@@ -34,12 +35,35 @@
 			</Setter>
 		</Style>
 	</Window.Resources>
-	<Grid
-        x:Name="mainGrid">
-		<Image
-            x:Name="image"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"/>
+	<Grid x:Name="mainGrid">
+		<Grid>
+			<!-- ScrollViewer for panning and zoom -->
+			<ScrollViewer x:Name="scrollViewer"
+                  HorizontalScrollBarVisibility="Hidden"
+                  VerticalScrollBarVisibility="Hidden"
+                  Background="Black"
+                  PanningMode="None">
+				<!-- Grid for centering -->
+				<Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+					<Image x:Name="DisplayImageControl"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   MouseLeftButtonDown="Image_MouseLeftButtonDown"
+                   MouseLeftButtonUp="Image_MouseLeftButtonUp"
+                   MouseMove="Image_MouseMove"
+                   MouseWheel="Image_MouseWheel">
+						<Image.RenderTransform>
+							<TransformGroup>
+								<ScaleTransform x:Name="ImageScale" ScaleX="1" ScaleY="1"/>
+								<TranslateTransform x:Name="ImageTranslate" X="0" Y="0"/>
+							</TransformGroup>
+						</Image.RenderTransform>
+					</Image>
+				</Grid>
+			</ScrollViewer>
+		</Grid>
+
+
 		<Button
             x:Name="openBtn"
             Style="{StaticResource NativeButtonWithShadowStyle}"
@@ -65,6 +89,12 @@
             IsEnabled="False"
             Cursor="Hand"
             Click="saveAsBtn_Click"/>
+		<Label x:Name="PerformanceLabel" 
+			   Margin="191,34,0,0" 
+			   Foreground="White" 
+			   FontSize="16"
+			   HorizontalAlignment="Left"
+			   VerticalAlignment="Top" Height="101" Width="375" ></Label>
 		<Grid
             HorizontalAlignment="Right"
             Margin="30">
@@ -86,25 +116,7 @@
                     Data="{StaticResource IconClose}"
                     Stretch="Fill"/>
 			</Button>
-			<Button
-                x:Name="colorPickerBtn"
-                Style="{StaticResource NativeButtonWithShadowStyle}"
-                Width="40" Height="40"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Top"
-                Margin="0,45,0,0"
-                ToolTip="Color picker"
-                ToolTipService.InitialShowDelay="1000"
-                ToolTipService.ShowDuration="2500"
-                ToolTipService.BetweenShowDelay="0"
-                Cursor="Hand"
-                IsEnabled="False">
-				<Path
-                    Fill="{Binding ElementName=colorPickerBtn, Path=Foreground}"
-                    Width="16" Height="16"
-                    Data="{StaticResource IconColorPicker}"
-                    Stretch="Fill"/>
-			</Button>
+
 			<Button
                 x:Name="zoomInBtn"
                 Style="{StaticResource NativeButtonWithShadowStyle}"
@@ -164,7 +176,7 @@
                     Data="{StaticResource IconZoomMinus}"
                     Stretch="Fill"/>
 			</Button>
-			<Button 
+			<!--<Button 
                 x:Name="settingsBtn"
                 Style="{StaticResource NativeButtonWithShadowStyle}"
                 Width="40" Height="40"
@@ -181,7 +193,7 @@
                     Width="22" Height="22"
                     Data="{StaticResource IconSettings}"
                     Stretch="Fill"/>
-			</Button>
+			</Button>-->
 			<Button
                 x:Name="infoBtn"
                 Style="{StaticResource NativeButtonWithShadowStyle}"

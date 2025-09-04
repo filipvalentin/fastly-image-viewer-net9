@@ -1,66 +1,70 @@
-﻿using fastly_image_viewer_net9;
+﻿using ImageMagick;
 using Microsoft.Win32;
+using System.Diagnostics;
 using System.IO;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
-namespace fastly_image_viewer_net9
-{
+namespace fastly_image_viewer_net9 {
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
 	public partial class MainWindow : Window {
-		public static string[] Args = Environment.GetCommandLineArgs();
+		public string[] Args = Environment.GetCommandLineArgs();
+		public BitmapImage? bitmap;
 
-		//private System.Windows.Forms.NotifyIcon _notifyIcon;
-		private Core.Image _image;
-		private ColorPickerWindow _pickerWindow;
-		private SettingsWindow _settingsWindow;
-		private InfoWindow _infoWindow;
+		private SettingsWindow settingsWindow;
+		private InfoWindow infoWindow;
+
+		private Point startPoint;
+		private bool isDragging = false;
 
 		public MainWindow() {
 			InitializeComponent();
 
-			//var context = new System.Windows.Forms.ContextMenu();
-			//context.MenuItems.Add("Quit", (s, e) => Environment.Exit(0));
+			settingsWindow = new SettingsWindow();
+			infoWindow = new InfoWindow();
 
-			//_notifyIcon = new System.Windows.Forms.NotifyIcon();
-			//_notifyIcon.Icon = Properties.Resources.FIV;
-			//_notifyIcon.Text = "Fastly Image Viewer";
-			//_notifyIcon.ContextMenu = context;
-			//_notifyIcon.Click += notifyIcon_Click;
-			//_notifyIcon.Visible = true;
+			//settingsBtn.Click += (s, e) => settingsWindow.Show();
+			infoBtn.Click += (s, e) => infoWindow.Show();
 
-			_pickerWindow = new ColorPickerWindow();
-			_settingsWindow = new SettingsWindow();
-			_infoWindow = new InfoWindow();
-
-			colorPickerBtn.Click += (s, e) => _pickerWindow.Show();
-			settingsBtn.Click += (s, e) => _settingsWindow.Show();
-			infoBtn.Click += (s, e) => _infoWindow.Show();
 
 			if (Args.Length > 1)
 				OpenImage(Args[1]);
+#if DEBUG
+			OpenImage("W:\\WDownloads\\20250803_175728.heic");
+#endif
 		}
 
-		public void OpenImage(string path) {
-			_image = new Core.Image(path);
+		
 
-			var width = _image.Bitmap.Width;
-			var height = _image.Bitmap.Height;
+		public async void OpenImage(string path) {
+			Stopwatch s = new(); s.Start();
+
+			if (!File.Exists(path))
+				throw new FileNotFoundException(path);
+
+			using var mimage = new MagickImage(path);
+			mimage.Format = MagickFormat.Bmp;
+			using var ms = new MemoryStream();
+			mimage.Write(ms);
+			var bitmapImage = new BitmapImage();
+			bitmapImage.BeginInit();
+			bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+			bitmapImage.StreamSource = ms;
+			bitmapImage.EndInit();
+			bitmapImage.Freeze();
+			await this.Dispatcher.InvokeAsync(() => {
+				DisplayImageControl.Source = bitmapImage;
+			});
+			var width = mimage.Width;
+			var height = mimage.Height;
 
 			var fileInfo = new FileInfo(path);
 
 			infoLbl.Visibility = Visibility.Visible;
-			infoLbl2.Content = $"{fileInfo.Name}\n{String.Format("{0:f2}", (double)fileInfo.Length / 1024)} KB\n{width} x {height}";
+			infoLbl2.Content = $"{fileInfo.Name}\n{string.Format("{0:f2}", (double)fileInfo.Length / 1024)} KB\n{width} x {height}";
 
 			while (width > SystemParameters.PrimaryScreenWidth * 70 / 100) {
 				width = width * 70 / 100;
@@ -70,21 +74,22 @@ namespace fastly_image_viewer_net9
 				height = height * 70 / 100;
 			}
 
-			image.Width = width;
-			image.Height = height;
+			DisplayImageControl.Width = width;
+			DisplayImageControl.Height = height;
 			grid.Visibility = Visibility.Hidden;
-			image.Source = _image.GetBitmapSource();
 
 			saveAsBtn.IsEnabled = true;
 			zoomInBtn.IsEnabled = true;
 			zoomReloadBtn.IsEnabled = true;
 			zoomOutBtn.IsEnabled = true;
-		}
 
-		private void notifyIcon_Click(object sender, EventArgs e) {
-			ShowInTaskbar = true;
-
-			Show();
+			s.Stop();
+			await this.Dispatcher.InvokeAsync(() => {
+				PerformanceLabel.Content = $"Image displayed in {s.ElapsedMilliseconds} ms";
+			});
+#if DEBUG
+			Debug.WriteLine($"Image displayed in {s.ElapsedMilliseconds} ms");
+#endif
 		}
 
 		private void Window_Drop(object sender, DragEventArgs e) {
@@ -95,48 +100,63 @@ namespace fastly_image_viewer_net9
 		}
 
 		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-			ShowInTaskbar = false;
+			settingsWindow.Close();
+			infoWindow.Close();
 
-			_pickerWindow.Close();
-			_settingsWindow.Close();
-			_infoWindow.Close();
-		}
-
-		private void Window_MouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e) {
-			if (_image == null)
-				return;
-
-			var width = _image.Bitmap.Width;
-			var height = _image.Bitmap.Height;
-
-			while (width > SystemParameters.PrimaryScreenWidth * 70 / 100) {
-				width = width * 70 / 100;
-			}
-
-			while (height > SystemParameters.PrimaryScreenHeight * 70 / 100) {
-				height = height * 70 / 100;
-			}
-
-			if (e.Delta > 0) {
-				if (image.Width > (SystemParameters.PrimaryScreenWidth * 70 / 100) || image.Height > (SystemParameters.PrimaryScreenHeight * 70 / 100))
-					return;
-
-				image.Width += width * 5 / 100;
-				image.Height += height * 5 / 100;
+			if (WindowState == WindowState.Maximized) {
+				// Use the RestoreBounds as the current values will be 0, 0 and the size of the screen
+				Properties.Settings.Default.Top = RestoreBounds.Top;
+				Properties.Settings.Default.Left = RestoreBounds.Left;
+				Properties.Settings.Default.Height = RestoreBounds.Height;
+				Properties.Settings.Default.Width = RestoreBounds.Width;
+				Properties.Settings.Default.Maximized = true;
 			}
 			else {
-				if (image.Width - width * 5 / 100 <= 0 || image.Height - height * 5 / 10 <= 0)
-					return;
+				Properties.Settings.Default.Top = this.Top;
+				Properties.Settings.Default.Left = this.Left;
+				Properties.Settings.Default.Height = this.Height;
+				Properties.Settings.Default.Width = this.Width;
+				Properties.Settings.Default.Maximized = false;
+			}
 
-				image.Width -= width * 5 / 100;
-				image.Height -= height * 5 / 100;
+			Properties.Settings.Default.Save();
+		}
+
+		private void Image_MouseMove(object sender, MouseEventArgs e) {
+			if (isDragging) {
+				Point pos = e.GetPosition(this);
+				Vector delta = pos - startPoint;
+
+				ImageTranslate.X += delta.X;
+				ImageTranslate.Y += delta.Y;
+
+				startPoint = pos;
 			}
 		}
+
+		private void Image_MouseWheel(object sender, MouseWheelEventArgs e) {
+			if (DisplayImageControl.Source == null) return;
+
+			double zoomFactor = e.Delta > 0 ? 1.1 : 0.9;
+			Point mousePos = e.GetPosition(DisplayImageControl);
+
+			// current scale
+			double currentScale = ImageScale.ScaleX;
+
+			// apply zoom
+			ImageScale.ScaleX *= zoomFactor;
+			ImageScale.ScaleY *= zoomFactor;
+
+			// adjust translation so the zoom centers on the mouse
+			ImageTranslate.X = (ImageTranslate.X - mousePos.X) * zoomFactor + mousePos.X;
+			ImageTranslate.Y = (ImageTranslate.Y - mousePos.Y) * zoomFactor + mousePos.Y;
+		}
+
 
 		private void openBtn_Click(object sender, RoutedEventArgs e) {
 			var dialog = new OpenFileDialog();
 			dialog.Filter =
-				"All supported (*.jpg;*.jpeg;*.png;*.gif;*.bmp;*.ico;*.tiff;*.wmf)|*.jpg;*.jpeg;*.png;*.gif;*.bmp;*.ico;*.tiff;*.wmf|" +
+				"All supported (*.jpg;*.jpeg;*.png;*.gif;*.bmp;*.ico;*.tiff;*.wmf;*.heic)|*.jpg;*.jpeg;*.png;*.gif;*.bmp;*.ico;*.tiff;*.wmf;*.heic|" +
 				"JPEG (*.jpg;*.jpeg)|*.jpg;*.jpeg|" +
 				"Portable Network Graphic (*.png)|*.png|" +
 				"Graphics Interchange Format (*.gif)|*.gif|" +
@@ -156,35 +176,37 @@ namespace fastly_image_viewer_net9
 				"Graphics Interchange Format (*.gif)|*.gif|" +
 				"Icon (*.ico)|*.ico";
 
-			if (dialog.ShowDialog() is true) {
-				switch (dialog.FilterIndex) {
-					case 1:
-						_image.Bitmap.Save(dialog.FileName, System.Drawing.Imaging.ImageFormat.Jpeg);
-						break;
-					case 2:
-						_image.Bitmap.Save(dialog.FileName, System.Drawing.Imaging.ImageFormat.Png);
-						break;
-					case 3:
-						_image.Bitmap.Save(dialog.FileName, System.Drawing.Imaging.ImageFormat.Gif);
-						break;
-					case 4:
-						_image.Bitmap.Save(dialog.FileName, System.Drawing.Imaging.ImageFormat.Icon);
-						break;
-				}
-			}
+			//if (dialog.ShowDialog() is true) {
+			//	switch (dialog.FilterIndex) {
+			//		case 1:
+			//			bitmap.Save(dialog.FileName, System.Drawing.Imaging.ImageFormat.Jpeg);
+			//			break;
+			//		case 2:
+			//			bitmap.Save(dialog.FileName, System.Drawing.Imaging.ImageFormat.Png);
+			//			break;
+			//		case 3:
+			//			_image.Bitmap.Save(dialog.FileName, System.Drawing.Imaging.ImageFormat.Gif);
+			//			break;
+			//		case 4:
+			//			_image.Bitmap.Save(dialog.FileName, System.Drawing.Imaging.ImageFormat.Icon);
+			//			break;
+			//	}
+			//}
 		}
 
 		private void closeBtn_Click(object sender, RoutedEventArgs e) {
 			Application.Current.Shutdown();
 			//Hide();
-			//_pickerWindow.Hide();
-			//_settingsWindow.Hide();
-			//_infoWindow.Hide();
+			//pickerWindow.Hide();
+			//settingsWindow.Hide();
+			//infoWindow.Hide();
 		}
 
 		private void zoomInBtn_Click(object sender, RoutedEventArgs e) {
-			var width = _image.Bitmap.Width;
-			var height = _image.Bitmap.Height;
+			if (DisplayImageControl.Source == null) return;
+
+			var width = DisplayImageControl.Width;
+			var height = DisplayImageControl.Height;
 
 			while (width > SystemParameters.PrimaryScreenWidth * 70 / 100) {
 				width = width * 70 / 100;
@@ -194,16 +216,18 @@ namespace fastly_image_viewer_net9
 				height = height * 70 / 100;
 			}
 
-			//if (image.Width > (SystemParameters.PrimaryScreenWidth * 70 / 100) || image.Height > (SystemParameters.PrimaryScreenHeight * 70 / 100))
+			//if (bitmap.Width > (SystemParameters.PrimaryScreenWidth * 70 / 100) || bitmap.Height > (SystemParameters.PrimaryScreenHeight * 70 / 100))
 			//	return;
 
-			image.Width += width * 5 / 100;
-			image.Height += height * 5 / 100;
+			DisplayImageControl.Width += width * 5 / 100;
+			DisplayImageControl.Height += height * 5 / 100;
 		}
 
 		private void zoomReloadBtn_Click(object sender, RoutedEventArgs e) {
-			var width = _image.Bitmap.Width;
-			var height = _image.Bitmap.Height;
+			if (DisplayImageControl.Source == null) return;
+
+			var width = DisplayImageControl.Width;
+			var height = DisplayImageControl.Height;
 
 			while (width > SystemParameters.PrimaryScreenWidth * 70 / 100) {
 				width = width * 70 / 100;
@@ -213,13 +237,15 @@ namespace fastly_image_viewer_net9
 				height = height * 70 / 100;
 			}
 
-			image.Width = width;
-			image.Height = height;
+			DisplayImageControl.Width = width;
+			DisplayImageControl.Height = height;
 		}
 
 		private void zoomOutBtn_Click(object sender, RoutedEventArgs e) {
-			var width = _image.Bitmap.Width;
-			var height = _image.Bitmap.Height;
+			if (DisplayImageControl.Source == null) return;
+
+			var width = DisplayImageControl.Width;
+			var height = DisplayImageControl.Height;
 
 			while (width > SystemParameters.PrimaryScreenWidth * 70 / 100) {
 				width = width * 70 / 100;
@@ -229,11 +255,39 @@ namespace fastly_image_viewer_net9
 				height = height * 70 / 100;
 			}
 
-			if (image.Width - width * 5 / 100 <= 0 || image.Height - height * 5 / 10 <= 0)
+			if (DisplayImageControl.Width - width * 5 / 100 <= 0 || DisplayImageControl.Height - height * 5 / 10 <= 0)
 				return;
 
-			image.Width -= width * 5 / 100;
-			image.Height -= height * 5 / 100;
+			DisplayImageControl.Width -= width * 5 / 100;
+			DisplayImageControl.Height -= height * 5 / 100;
+		}
+
+		private void Image_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) {
+			startPoint = e.GetPosition(scrollViewer);
+			isDragging = true;
+			DisplayImageControl.CaptureMouse();
+		}
+
+		private void Image_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
+			isDragging = false;
+			DisplayImageControl.ReleaseMouseCapture();
+		}
+
+		private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e) {
+			if (e.Key == System.Windows.Input.Key.Escape) {
+				Application.Current.Shutdown();
+			}
+		}
+
+		private void Window_SourceInitialized(object sender, EventArgs e) {
+			this.Top = Properties.Settings.Default.Top;
+			this.Left = Properties.Settings.Default.Left;
+			this.Height = Properties.Settings.Default.Height;
+			this.Width = Properties.Settings.Default.Width;
+			// Very quick and dirty - but it does the job
+			if (Properties.Settings.Default.Maximized) {
+				WindowState = WindowState.Maximized;
+			}
 		}
 	}
 }

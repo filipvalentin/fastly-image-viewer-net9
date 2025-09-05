@@ -12,14 +12,14 @@ namespace fastly_image_viewer_net9 {
 			base.OnStartup(e);
 			// your normal startup logic continues here
 		}
-		public bool SignalExternalCommandLineArgs(IList<string> args) {
-			if (args.Count > 1 && MainWindow is MainWindow mainWindow) {
-				mainWindow.OpenImage(args[1]);
-				if (!mainWindow.IsActive)
-					mainWindow.Show();
-			}
+		//public bool SignalExternalCommandLineArgs(IList<string> args) {
+		//	if (args.Count > 1 && MainWindow is MainWindow mainWindow) {
+		//		mainWindow.OpenImage(args[1]);
+		//		if (!mainWindow.IsActive)
+		//			mainWindow.Show();
+		//	}
 
-			return true;
-		}
+		//	return true;
+		//}
 	}
 }

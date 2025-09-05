@@ -6,65 +6,57 @@
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:fastly_image_viewer_net9"
 		mc:Ignorable="d"
-		MinHeight="320"
+		MinHeight="400"
 		MinWidth="400"
 		WindowStyle="SingleBorderWindow"
         SourceInitialized="Window_SourceInitialized"
         Background="#2F2F2F"
         AllowDrop="True"
         Closing="Window_Closing" Drop="Window_Drop" KeyDown="Window_KeyDown">
-	<Window.Resources>
-		<!-- ToolTip Style -->
-		<Style TargetType="ToolTip">
-			<Setter Property="Template">
-				<Setter.Value>
-					<ControlTemplate TargetType="ToolTip">
-						<Grid
+    <Window.Resources>
+        <!-- ToolTip Style -->
+        <Style TargetType="ToolTip">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToolTip">
+                        <Grid
 							Background="#2F2F2F">
-							<Border 
+                            <Border 
                                 Background="#2F2F2F"
                                 BorderBrush="#191919"
                                 BorderThickness="1">
-								<Label
+                                <Label
                                     Foreground="#99FFFFFF"
                                     Content="{TemplateBinding Content}"/>
-							</Border>
-						</Grid>
-					</ControlTemplate>
-				</Setter.Value>
-			</Setter>
-		</Style>
-	</Window.Resources>
-	<Grid x:Name="mainGrid">
-		<Grid>
-			<!-- ScrollViewer for panning and zoom -->
-			<ScrollViewer x:Name="scrollViewer"
-                  HorizontalScrollBarVisibility="Hidden"
-                  VerticalScrollBarVisibility="Hidden"
-                  Background="Black"
-                  PanningMode="None">
-				<!-- Grid for centering -->
-				<Grid HorizontalAlignment="Center" VerticalAlignment="Center">
-					<Image x:Name="DisplayImageControl"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   MouseLeftButtonDown="Image_MouseLeftButtonDown"
-                   MouseLeftButtonUp="Image_MouseLeftButtonUp"
-                   MouseMove="Image_MouseMove"
-                   MouseWheel="Image_MouseWheel">
-						<Image.RenderTransform>
-							<TransformGroup>
-								<ScaleTransform x:Name="ImageScale" ScaleX="1" ScaleY="1"/>
-								<TranslateTransform x:Name="ImageTranslate" X="0" Y="0"/>
-							</TransformGroup>
-						</Image.RenderTransform>
-					</Image>
-				</Grid>
-			</ScrollViewer>
-		</Grid>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Grid x:Name="mainGrid">
+
+        <Canvas x:Name="ImageCanvas" Background="Black">
+            <Image x:Name="DisplayImageControl"
+               MouseLeftButtonDown="Image_MouseLeftButtonDown"
+               MouseLeftButtonUp="Image_MouseLeftButtonUp"
+               MouseMove="Image_MouseMove"
+               MouseWheel="Image_MouseWheel"
+               MouseEnter="Image_MouseEnter"
+               MouseLeave="Image_MouseLeave"
+               Stretch="None"
+               RenderTransformOrigin="0,0">
+                <Image.RenderTransform>
+                    <MatrixTransform x:Name="ImageTransform"/>
+                </Image.RenderTransform>
+            </Image>
+        </Canvas>
 
 
-		<Button
+
+
+        <Button
             x:Name="openBtn"
             Style="{StaticResource NativeButtonWithShadowStyle}"
             Width="60" Height="40"
@@ -76,7 +68,7 @@
             Content="OPEN"
             Cursor="Hand"
             Click="openBtn_Click"/>
-		<Button
+        <Button
             x:Name="saveAsBtn"
             Style="{StaticResource NativeButtonWithShadowStyle}"
             Width="70" Height="40"
@@ -89,16 +81,16 @@
             IsEnabled="False"
             Cursor="Hand"
             Click="saveAsBtn_Click"/>
-		<Label x:Name="PerformanceLabel" 
+        <Label x:Name="PerformanceLabel" 
 			   Margin="191,34,0,0" 
 			   Foreground="White" 
 			   FontSize="16"
 			   HorizontalAlignment="Left"
 			   VerticalAlignment="Top" Height="101" Width="375" ></Label>
-		<Grid
+        <Grid
             HorizontalAlignment="Right"
             Margin="30">
-			<Button 
+            <Button 
                 x:Name="closeBtn"
                 Style="{StaticResource NativeButtonWithShadowStyle}"
                 Width="40" Height="40"
@@ -110,73 +102,53 @@
                 ToolTipService.BetweenShowDelay="0"
                 Cursor="Hand"
                 Click="closeBtn_Click">
-				<Path
+                <Path
                     Fill="{Binding ElementName=closeBtn, Path=Foreground}"
                     Width="16" Height="16"
                     Data="{StaticResource IconClose}"
                     Stretch="Fill"/>
-			</Button>
+            </Button>
 
-			<Button
-                x:Name="zoomInBtn"
-                Style="{StaticResource NativeButtonWithShadowStyle}"
-                Width="40" Height="40"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Margin="0,0,0,90" 
-                ToolTip="Zoom in"
-                ToolTipService.InitialShowDelay="1000"
-                ToolTipService.ShowDuration="2500"
-                ToolTipService.BetweenShowDelay="0"
-                IsEnabled="False"
-                Cursor="Hand"
-                Click="zoomInBtn_Click">
-				<Path
-                    Fill="{Binding ElementName=zoomInBtn, Path=Foreground}"
-                    Width="20" Height="20"
-                    Data="{StaticResource IconZoomPlus}"
-                    Stretch="Fill"/>
-			</Button>
-			<Button
-                x:Name="zoomReloadBtn"
-                Style="{StaticResource NativeButtonWithShadowStyle}"
-                Width="40" Height="40"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center" 
-                ToolTip="Zoom refresh"
-                ToolTipService.InitialShowDelay="1000"
-                ToolTipService.ShowDuration="2500"
-                ToolTipService.BetweenShowDelay="0"
-                IsEnabled="False"
-                Cursor="Hand"
-                Click="zoomReloadBtn_Click">
-				<Path
-                    Fill="{Binding ElementName=zoomReloadBtn, Path=Foreground}"
-                    Width="20" Height="20"
-                    Data="{StaticResource IconReload}"
-                    Stretch="Fill"/>
-			</Button>
-			<Button
-                x:Name="zoomOutBtn"
-                Style="{StaticResource NativeButtonWithShadowStyle}"
-                Width="40" Height="40"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Margin="0,90,0,0"
-                ToolTip="Zoom out"
-                ToolTipService.InitialShowDelay="1000"
-                ToolTipService.ShowDuration="2500"
-                ToolTipService.BetweenShowDelay="0"
-                IsEnabled="False"
-                Cursor="Hand"
-                Click="zoomOutBtn_Click">
-				<Path
-                    Fill="{Binding ElementName=zoomOutBtn, Path=Foreground}"
-                    Width="20" Height="20"
-                    Data="{StaticResource IconZoomMinus}"
-                    Stretch="Fill"/>
-			</Button>
-			<!--<Button 
+            <StackPanel VerticalAlignment="Center">
+                <Button
+                    x:Name="zoomInBtn"
+                    Style="{StaticResource NativeButtonWithShadowStyle}"
+                    Width="40" Height="40"
+                    ToolTip="Zoom in"
+                    ToolTipService.InitialShowDelay="1000"
+                    ToolTipService.ShowDuration="2500"
+                    ToolTipService.BetweenShowDelay="0"
+                    IsEnabled="False"
+                    Cursor="Hand"
+                    Click="zoomInBtn_Click">
+                    <Path
+                        Fill="{Binding Foreground, ElementName=zoomInBtn}"
+                        Width="20" Height="20"
+                        Data="{StaticResource IconZoomPlus}"
+                        Stretch="Fill"/>
+                </Button>
+                <Separator Height="10"  Width="0" />
+                <Button
+                    x:Name="zoomOutBtn"
+                    Style="{StaticResource NativeButtonWithShadowStyle}"
+                    Width="40" Height="40"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    ToolTip="Zoom out"
+                    ToolTipService.InitialShowDelay="1000"
+                    ToolTipService.ShowDuration="2500"
+                    ToolTipService.BetweenShowDelay="0"
+                    IsEnabled="False"
+                    Cursor="Hand"
+                    Click="zoomOutBtn_Click">
+                    <Path
+                        Fill="{Binding Foreground, ElementName=zoomOutBtn}"
+                        Width="20" Height="20"
+                        Data="{StaticResource IconZoomMinus}"
+                        Stretch="Fill"/>
+                </Button>
+            </StackPanel>
+            <!--<Button 
                 x:Name="settingsBtn"
                 Style="{StaticResource NativeButtonWithShadowStyle}"
                 Width="40" Height="40"
@@ -194,7 +166,7 @@
                     Data="{StaticResource IconSettings}"
                     Stretch="Fill"/>
 			</Button>-->
-			<Button
+            <Button
                 x:Name="infoBtn"
                 Style="{StaticResource NativeButtonWithShadowStyle}"
                 Width="40" Height="40"
@@ -205,26 +177,26 @@
                 ToolTipService.ShowDuration="2500"
                 ToolTipService.BetweenShowDelay="0"
                 Cursor="Hand">
-				<Path
+                <Path
                     Fill="{Binding ElementName=infoBtn, Path=Foreground}"
                     Width="22" Height="22"
                     Data="{StaticResource IconInfo}"
                     Stretch="Fill"/>
-			</Button>
-		</Grid>
-		<Grid
+            </Button>
+        </Grid>
+        <!--<Grid //fix later?
             x:Name="grid"
             Width="300" Height="300"
             HorizontalAlignment="Center"
             VerticalAlignment="Center">
-			<Label
+            <Label
                 Foreground="#FFF5F5F5"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 FontFamily="Segoe UI Light"
                 FontSize="18"
                 Content="NO IMAGE CONTENT"/>
-			<!--<c:ClickableTextBlock
+            <c:ClickableTextBlock
                 Style="{StaticResource LinkTextBlock}"
                 Foreground="#FFD1D1D1"
                 ClickForeground="White"
@@ -235,24 +207,7 @@
                 FontSize="18"
                 Text="OPEN"
                 Click="openBtn_Click"
-                Cursor="Hand"/>-->
-		</Grid>
-		<Label
-            x:Name="infoLbl"
-            Foreground="#FFBDBDBD"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Bottom"
-            Margin="30, 33"
-            FlowDirection="RightToLeft"
-            FontSize="14" 
-            Visibility="Hidden"
-            Content=":File name&#xA;:File size&#xA;:Size"/>
-		<Label
-            x:Name="infoLbl2"
-            Foreground="#FFCBCBCB"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Bottom"
-            Margin="100, 30"
-            FontSize="16"/>
-	</Grid>
+                Cursor="Hand"/>
+        </Grid>-->
+    </Grid>
 </Window>

@@ -8,82 +8,76 @@
         mc:Ignorable="d"
         Title="InfoWindow"
         WindowStyle="None"
-        WindowStartupLocation="CenterScreen"
-        Width="500" Height="210"
+        Width="400" Height="210"
         Topmost="True"
         AllowsTransparency="True"
-        Background="#7F000000">
-	<Grid>
-		<Border 
-            BorderBrush="#BF191919"
-            BorderThickness="1"/>
-		<Button 
+        Background="#7F000000" Loaded="Window_Loaded" Cursor="Hand"
+        MouseDown="Window_MouseDown">
+    <StackPanel Orientation="Horizontal" Margin="10">
+        <StackPanel Width="340">
+            <StackPanel Orientation="Horizontal">
+                <Label
+                    Foreground="White"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    FontSize="14"
+                    Content="Fastly Image Viewer"/>
+                <Label
+                    Foreground="Gray"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Bottom"
+                    HorizontalContentAlignment="Right"
+                    FontSize="11"
+                    Margin="10,0,0,0"
+                    Content="Version"/>
+                <Label 
+                    x:Name="VersionLabel"
+                    Foreground="Gray"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Bottom"
+                    FontSize="11"/>
+            </StackPanel>
+            <Label
+                Foreground="Gray"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                FontSize="12"
+                Content="The fast and simple image viewer that supports HEIC images."/>
+            <Separator
+                Background="#CC000000"
+                Width="340" Height="20"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"/>
+            <Label
+                x:Name="FileInfoHeaderLabel"
+                Foreground="White"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                FontSize="13"
+                Content="File info"
+                Visibility="Hidden"/>
+            <Label
+                 x:Name="FileInfoLabel"
+                 Foreground="White"
+                 HorizontalAlignment="Left"
+                 VerticalAlignment="Center"
+                 FontSize="13"/>
+        </StackPanel>
+        <Button 
             x:Name="closeBtn"
             Style="{StaticResource NativeButtonStyle}"
             Width="40" Height="40"
             HorizontalAlignment="Right"
             VerticalAlignment="Top"
-            Margin="30"
             Cursor="Hand">
-			<Path
+            <Path
                 Fill="#FFF5F5F5"
                 Width="16" Height="16"
                 Data="{StaticResource IconClose}"
                 Stretch="Fill"/>
-		</Button>
-		<Label
-            Foreground="White"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            Margin="30,30,0,0"
-            FontSize="14"
-            Content="Fastly Image Viewer"/>
-		<Label
-            Foreground="Gray"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            Margin="30,55,0,0"
-            FontSize="12"
-            Content="The fast and simple image viewer written on C#"/>
-		<Separator
-            Background="#CC000000"
-            Width="435" Height="20"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            Margin="34.955,80,0,0"/>
-		<Label
-            Foreground="Gray"
-            Width="48"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            Margin="40,100,0,0"
-            HorizontalContentAlignment="Right"
-            FontSize="11"
-            Content="Author:" />
-		<Label
-            Foreground="White"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            Margin="85,98,0,0"
-            FontSize="13"
-            Content="Rebzzel"/>
-		<Label
-            Foreground="Gray"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            Margin="40,125,0,0"
-            HorizontalContentAlignment="Right"
-            FontSize="11"
-            Content="Version:"/>
-		<Label
-            x:Name="versionLbl"
-            Foreground="White"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            Margin="85,124,0,0"
-            FontSize="13"
-            Content="Not released"/>
-		<!--<c:ClickableTextBlock 
+        </Button>
+
+        <!--<c:ClickableTextBlock 
             x:Name="githubLbl"
             Style="{StaticResource LinkTextBlock}"
             Foreground="#FF00A2FF"
@@ -92,5 +86,5 @@
             Margin="30"
             Text="Github"
             Cursor="Hand"/>-->
-	</Grid>
+    </StackPanel>
 </Window>

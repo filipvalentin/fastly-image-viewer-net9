@@ -1,20 +1,41 @@
 ﻿using System.Windows;
+using System.Windows.Input;
 
 namespace fastly_image_viewer_net9 {
     public partial class InfoWindow : Window
     {
-        public InfoWindow()
+
+        MainWindow mainWindow;
+
+        public InfoWindow(MainWindow mW)
         {
             InitializeComponent();
+            mainWindow = mW;
 
-            versionLbl.Content = $"{Properties.Settings.Default.Version}";
+            VersionLabel.Content = Properties.Settings.Default.Version;
 
-            closeBtn.Click += (s, e) => Hide();
-            //githubLbl.Click += (s, e) => System.Diagnostics.Process.Start("https://github.com/Rebzzel/Fastly-Image-Viewer");
+			closeBtn.Click += (s, e) => Hide();
         }
 
 		protected override void OnClosed(EventArgs e) {
 			Application.Current.Shutdown();
 		}
-    }
+
+		private void Window_Loaded(object sender, RoutedEventArgs e)
+		{
+            if (mainWindow.fileInfoStr == null) return;
+
+			FileInfoHeaderLabel.Visibility = Visibility.Visible;
+			FileInfoLabel.Content = mainWindow.fileInfoStr;
+		}
+
+
+		private void Window_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		{
+			if (e.ButtonState == MouseButtonState.Pressed)
+			{
+				DragMove();
+			}
+		}
+	}
 }

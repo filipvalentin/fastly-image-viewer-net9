@@ -3,24 +3,22 @@ Fast and simple open source image viewer written in .NET 9 WPF under the [GNU Ge
 
 Forked for the sole purpose of creating a quick-to-develop, lightweight, image viewer that can finally open HEIC images without paying [$1](https://apps.microsoft.com/detail/9nmzlz57r3t7) to Microsoft.
 
-I'll update more things as time goes by, but be sure that the hate of paying for viewing an image file in the default editor will make me continue working on it.
-
 <br/>
 
 ## To Do
-  - [ ] Rewrite the UI & controls; fix windows
-  - [x] Expand zoom functionality 
+  - [x] Rewrite the UI & controls;
+  - [x] Expand zoom functionality: panning, clamping, zoom to pointer
   - [ ] Installer / portable folder
-  - [x] Improve performance / parallelize 
+  - [x] Improve performance
  
 <br/>
 
 ## How to
- - **Build**: Just clone the repo. 
+ - **Modify & Build**: Clone the repo. Make sure you have *.NET Desktop Development* packages installed.
  - **Install**: Someday I'll provide an installer.
  - **In both cases, the final step**: right click on a .heic file > Properties. On the "Opens with:" section click on `Change ...` button. Browse for ***fastly-image-viewer-net9.exe*** and click OK. Now the app will open your .heic files!
  
-Target platforms: Windows 7 and above
+Target platforms: Windows 7 and above;
 
 <br/>
 

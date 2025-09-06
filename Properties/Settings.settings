@@ -2,9 +2,6 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="fastly_image_viewer_net9.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="Version" Type="System.String" Scope="User">
-      <Value Profile="(Default)">1.1</Value>
-    </Setting>
     <Setting Name="IsFirstRun" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
@@ -22,6 +19,9 @@
     </Setting>
     <Setting Name="Maximized" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="Version" Type="System.String" Scope="User">
+      <Value Profile="(Default)">1.2</Value>
     </Setting>
   </Settings>
 </SettingsFile>

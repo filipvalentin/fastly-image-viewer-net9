@@ -2,27 +2,26 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:c="clr-namespace:fastly_image_viewer_net9.Controls"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:fastly_image_viewer_net9"
         mc:Ignorable="d"
         Title="InfoWindow"
         WindowStyle="None"
-        Width="400" Height="210"
+        Width="400" Height="230"
         Topmost="True"
         AllowsTransparency="True"
-        Background="#7F000000" Loaded="Window_Loaded" Cursor="Hand"
+        Background="#303030" Loaded="Window_Loaded" Cursor="Hand"
         MouseDown="Window_MouseDown">
-    <StackPanel Orientation="Horizontal" Margin="10">
-        <StackPanel Width="340">
-            <StackPanel Orientation="Horizontal">
-                <Label
+	<StackPanel Orientation="Horizontal" Margin="10">
+		<StackPanel Width="340">
+			<StackPanel Orientation="Horizontal">
+				<Label
                     Foreground="White"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Top"
                     FontSize="14"
                     Content="Fastly Image Viewer"/>
-                <Label
+				<Label
                     Foreground="Gray"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Bottom"
@@ -30,25 +29,25 @@
                     FontSize="11"
                     Margin="10,0,0,0"
                     Content="Version"/>
-                <Label 
+				<Label 
                     x:Name="VersionLabel"
                     Foreground="Gray"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Bottom"
                     FontSize="11"/>
-            </StackPanel>
-            <Label
-                Foreground="Gray"
+			</StackPanel>
+			<Label
+                Foreground="#dbdbdb"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
                 FontSize="12"
                 Content="The fast and simple image viewer that supports HEIC images."/>
-            <Separator
+			<Separator
                 Background="#CC000000"
                 Width="340" Height="20"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"/>
-            <Label
+			<Label
                 x:Name="FileInfoHeaderLabel"
                 Foreground="White"
                 HorizontalAlignment="Left"
@@ -56,28 +55,28 @@
                 FontSize="13"
                 Content="File info"
                 Visibility="Hidden"/>
-            <Label
+			<Label
                  x:Name="FileInfoLabel"
                  Foreground="White"
                  HorizontalAlignment="Left"
                  VerticalAlignment="Center"
                  FontSize="13"/>
-        </StackPanel>
-        <Button 
-            x:Name="closeBtn"
+		</StackPanel>
+		<Button 
+            x:Name="CloseButton"
             Style="{StaticResource NativeButtonStyle}"
             Width="40" Height="40"
             HorizontalAlignment="Right"
             VerticalAlignment="Top"
             Cursor="Hand">
-            <Path
+			<Path
                 Fill="#FFF5F5F5"
                 Width="16" Height="16"
                 Data="{StaticResource IconClose}"
                 Stretch="Fill"/>
-        </Button>
+		</Button>
 
-        <!--<c:ClickableTextBlock 
+		<!--<c:ClickableTextBlock 
             x:Name="githubLbl"
             Style="{StaticResource LinkTextBlock}"
             Foreground="#FF00A2FF"
@@ -86,5 +85,5 @@
             Margin="30"
             Text="Github"
             Cursor="Hand"/>-->
-    </StackPanel>
+	</StackPanel>
 </Window>

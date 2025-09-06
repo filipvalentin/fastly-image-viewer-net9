@@ -1,66 +1,59 @@
 ﻿using ImageMagick;
 using Microsoft.Win32;
 using System.Diagnostics;
-using System.Drawing.Drawing2D;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using Matrix = System.Windows.Media.Matrix;
 
-namespace fastly_image_viewer_net9
-{
+namespace fastly_image_viewer_net9 {
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
-	public partial class MainWindow : Window
-	{
+	public partial class MainWindow : Window {
 		public string[] Args = Environment.GetCommandLineArgs();
-		public BitmapImage? bitmap;
+		public MagickImage? mimage;
 
-		private InfoWindow infoWindow;
+		private readonly InfoWindow infoWindow;
 
 		private Matrix matrix = Matrix.Identity;
 		private bool isDragging = false;
 		private bool isMouseOverImage = false;
 		private Point startPoint;
 
+		private readonly DispatcherTimer inactivityTimer;
+		private bool isHidden = false;
+		private readonly Storyboard fadeOut;
+		private readonly Storyboard fadeIn;
 		public string? fileInfoStr = null;
 
-		public MainWindow()
-		{
+		public MainWindow() {
 			InitializeComponent();
 
 			this.SizeChanged += (s, e) => FitToWindow();
 
-			infoWindow = new InfoWindow(this);
-
-			infoBtn.Click += (s, e) => infoWindow.Show();
-
 			if (Args.Length > 1)
 				_ = Task.Run(async () => await OpenImage(Args[1]));
-#if DEBUG
-			_ = Task.Run(async () => await OpenImage("W:\\WDownloads\\20250803_175728.heic"));
-#endif
+
+			infoWindow = new InfoWindow(this);
+			InfoButton.Click += (s, e) => infoWindow.Show();
+
+			fadeOut = (Storyboard)FindResource("FadeOutStoryboard");
+			fadeIn = (Storyboard)FindResource("FadeInStoryboard");
+			inactivityTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+			inactivityTimer.Tick += InactivityTimer_Tick;
+			inactivityTimer.Start();
 		}
 
 		#region WINDOW stuff
-		private void Window_Drop(object sender, DragEventArgs e)
-		{
-			if (e.Data.GetDataPresent(DataFormats.FileDrop))
-			{
-				string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-				_ = Task.Run(async () => await OpenImage(files[0]));
-			}
-		}
-
-		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-		{
+		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+			mimage?.Dispose();
 			infoWindow.Close();
 
-			if (WindowState == WindowState.Maximized)
-			{
+			if (WindowState == WindowState.Maximized) {
 				// Use the RestoreBounds as the current values will be 0, 0 and the size of the screen
 				Properties.Settings.Default.Top = RestoreBounds.Top;
 				Properties.Settings.Default.Left = RestoreBounds.Left;
@@ -68,8 +61,7 @@ namespace fastly_image_viewer_net9
 				Properties.Settings.Default.Width = RestoreBounds.Width;
 				Properties.Settings.Default.Maximized = true;
 			}
-			else
-			{
+			else {
 				Properties.Settings.Default.Top = this.Top;
 				Properties.Settings.Default.Left = this.Left;
 				Properties.Settings.Default.Height = this.Height;
@@ -80,38 +72,44 @@ namespace fastly_image_viewer_net9
 			Properties.Settings.Default.Save();
 		}
 
-		private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-		{
-			if (e.Key == System.Windows.Input.Key.Escape)
-			{
+		private void Window_KeyDown(object sender, KeyEventArgs e) {
+			if (e.Key == Key.Escape) {
 				Application.Current.Shutdown();
+			}
+			if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control) {
+				switch (e.Key) {
+					case Key.OemPlus:
+						ZoomAtCenter(1.2);
+						break;
+					case Key.OemMinus:
+						ZoomAtCenter(0.8);
+						break;
+				}
+
 			}
 		}
 
-		private void Window_SourceInitialized(object sender, EventArgs e)
-		{
+		private void Window_SourceInitialized(object sender, EventArgs e) {
 			this.Top = Properties.Settings.Default.Top;
 			this.Left = Properties.Settings.Default.Left;
 			this.Height = Properties.Settings.Default.Height;
 			this.Width = Properties.Settings.Default.Width;
 			// Very quick and dirty - but it does the job
-			if (Properties.Settings.Default.Maximized)
-			{
+			if (Properties.Settings.Default.Maximized) {
 				WindowState = WindowState.Maximized;
 			}
 		}
 		#endregion
 
-
-		public async Task OpenImage(string path)
-		{
-			Stopwatch s = new(); s.Start();
+		public async Task OpenImage(string path) {
+			var s = Stopwatch.StartNew();
 
 			if (!File.Exists(path))
 				throw new FileNotFoundException(path);
 
-			using var mimage = new MagickImage(path);
-			mimage.Format = MagickFormat.Bmp;
+			mimage?.Dispose();
+
+			mimage = new MagickImage(path) { Format = MagickFormat.Bmp };
 
 			using var ms = new MemoryStream();
 			mimage.Write(ms);
@@ -122,28 +120,25 @@ namespace fastly_image_viewer_net9
 			bitmapImage.StreamSource = ms;
 			bitmapImage.EndInit();
 			bitmapImage.Freeze();
-			await this.Dispatcher.InvokeAsync(() =>
-			{
+
+			await this.Dispatcher.InvokeAsync(() => {
 				DisplayImageControl.Source = bitmapImage;
 
 				FitToWindow();
 
-				//grid.Visibility = Visibility.Hidden;
-				saveAsBtn.IsEnabled = true;
-				zoomInBtn.IsEnabled = true;
-				//zoomRotateBtn.IsEnabled = true;
-				zoomOutBtn.IsEnabled = true;
+				SaveAsButton.IsEnabled = true;
+				ZoomInButton.IsEnabled = true;
+				ZoomOutButton.IsEnabled = true;
 			});
 
 			s.Stop();
 
 			var fileInfo = new FileInfo(path);
-			fileInfoStr = $"File name {fileInfo.Name}\nDisk size {string.Format("{0:f2}", (double)fileInfo.Length / 1024)} KB\nSize {mimage.Width} x {mimage.Height}\nImage displayed in {s.ElapsedMilliseconds} ms";
+			fileInfoStr = $"File name: {fileInfo.Name}\nDisk size: {string.Format("{0:f2}", (double)fileInfo.Length / 1024)} KB\nSize: {mimage.Width} x {mimage.Height} px\nImage displayed in {s.ElapsedMilliseconds} ms";
 		}
 
-
-		private void FitToWindow()
-		{
+		#region Panning, Clamping, Zooming
+		private void FitToWindow() {
 			if (DisplayImageControl.Source == null) return;
 
 			double windowWidth = ImageCanvas.ActualWidth;
@@ -161,8 +156,7 @@ namespace fastly_image_viewer_net9
 			ImageTransform.Matrix = matrix;
 		}
 
-		private void ClampPan()
-		{
+		private void ClampPan() {
 			if (DisplayImageControl.Source == null) return;
 
 			double imgWidth = DisplayImageControl.Source.Width * matrix.M11;
@@ -175,23 +169,19 @@ namespace fastly_image_viewer_net9
 			double offsetY = matrix.OffsetY;
 
 			// If the image is smaller than window → center it
-			if (imgWidth <= windowWidth)
-			{
+			if (imgWidth <= windowWidth) {
 				offsetX = (windowWidth - imgWidth) / 2;
 			}
-			else
-			{
+			else {
 				// Clamp so the image does not leave gaps
 				if (offsetX > 0) offsetX = 0; // left edge
 				if (offsetX + imgWidth < windowWidth) offsetX = windowWidth - imgWidth; // right edge
 			}
 
-			if (imgHeight <= windowHeight)
-			{
+			if (imgHeight <= windowHeight) {
 				offsetY = (windowHeight - imgHeight) / 2;
 			}
-			else
-			{
+			else {
 				// Clamp so the image does not leave gaps
 				if (offsetY > 0) offsetY = 0; // top edge
 				if (offsetY + imgHeight < windowHeight) offsetY = windowHeight - imgHeight; // bottom edge
@@ -202,8 +192,7 @@ namespace fastly_image_viewer_net9
 			ImageTransform.Matrix = matrix;
 		}
 
-		private void Image_MouseWheel(object sender, MouseWheelEventArgs e)
-		{
+		private void Image_MouseWheel(object sender, MouseWheelEventArgs e) {
 			if (!isMouseOverImage || DisplayImageControl.Source == null) return;
 
 			double zoom = e.Delta > 0 ? 1.1 : 0.9;
@@ -216,10 +205,8 @@ namespace fastly_image_viewer_net9
 			ClampPan();
 		}
 
-		private void Image_MouseMove(object sender, MouseEventArgs e)
-		{
-			if (isDragging && isMouseOverImage)
-			{
+		private void Image_MouseMove(object sender, MouseEventArgs e) {
+			if (isDragging && isMouseOverImage) {
 				Point pos = e.GetPosition(this);
 				Vector delta = pos - startPoint;
 
@@ -230,31 +217,24 @@ namespace fastly_image_viewer_net9
 			}
 		}
 
-
-
-		private void Image_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-		{
+		private void Image_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) {
 			if (!isMouseOverImage) return;
 			startPoint = e.GetPosition(this);
 			isDragging = true;
 			DisplayImageControl.CaptureMouse();
 		}
 
-		private void Image_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-		{
+		private void Image_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
 			isDragging = false;
 			DisplayImageControl.ReleaseMouseCapture();
 		}
 
-
 		private void Image_MouseEnter(object sender, MouseEventArgs e) => isMouseOverImage = true;
 		private void Image_MouseLeave(object sender, MouseEventArgs e) => isMouseOverImage = false;
+		#endregion
 
-
-		private void openBtn_Click(object sender, RoutedEventArgs e)
-		{
-			var dialog = new OpenFileDialog
-			{
+		private void OpenButton_Click(object sender, RoutedEventArgs e) {
+			var dialog = new OpenFileDialog {
 				Filter =
 					"All supported (*.jpg;*.jpeg;*.png;*.gif;*.bmp;*.ico;*.tiff;*.wmf;*.heic)|*.jpg;*.jpeg;*.png;*.gif;*.bmp;*.ico;*.tiff;*.wmf;*.heic|" +
 					"JPEG (*.jpg;*.jpeg)|*.jpg;*.jpeg|" +
@@ -269,42 +249,41 @@ namespace fastly_image_viewer_net9
 				_ = Task.Run(async () => await OpenImage(dialog.FileName));
 		}
 
-		private void saveAsBtn_Click(object sender, RoutedEventArgs e)
-		{
-			var dialog = new SaveFileDialog();
-			dialog.Filter =
-				"JPEG (*.jpg;*.jpeg)|*.jpg;*.jpeg|" +
-				"Portable Network Graphic (*.png)|*.png|" +
-				"Graphics Interchange Format (*.gif)|*.gif|" +
-				"Icon (*.ico)|*.ico";
+		private void SaveAsButton_Click(object sender, RoutedEventArgs e) {
+			var dialog = new SaveFileDialog {
+				Filter =
+					"JPEG (*.jpg;*.jpeg)|*.jpg;*.jpeg|" +
+					"Portable Network Graphic (*.png)|*.png|" +
+					"Graphics Interchange Format (*.gif)|*.gif|" +
+					"Bitmap (*.bmp)|*.bmp\\"
+			};
 
-			//if (dialog.ShowDialog() is true) {
-			//	switch (dialog.FilterIndex) {
-			//		case 1:
-			//			bitmap.Save(dialog.FileName, System.Drawing.Imaging.ImageFormat.Jpeg);
-			//			break;
-			//		case 2:
-			//			bitmap.Save(dialog.FileName, System.Drawing.Imaging.ImageFormat.Png);
-			//			break;
-			//		case 3:
-			//			_image.Bitmap.Save(dialog.FileName, System.Drawing.Imaging.ImageFormat.Gif);
-			//			break;
-			//		case 4:
-			//			_image.Bitmap.Save(dialog.FileName, System.Drawing.Imaging.ImageFormat.Icon);
-			//			break;
-			//	}
-			//}
+
+			if (dialog.ShowDialog() is true) {
+				switch (dialog.FilterIndex) {
+					case 1:
+						mimage?.Write(dialog.FileName, MagickFormat.Jpg);
+						break;
+					case 2:
+						mimage?.Write(dialog.FileName, MagickFormat.Png);
+						break;
+					case 3:
+						mimage?.Write(dialog.FileName, MagickFormat.Gif);
+						break;
+					case 4:
+						mimage?.Write(dialog.FileName, MagickFormat.Bmp);
+						break;
+				}
+			}
 		}
 
-		private void closeBtn_Click(object sender, RoutedEventArgs e)
-		{
+		private void CloseButton_Click(object sender, RoutedEventArgs e) {
 			Application.Current.Shutdown();
 			Hide();
 			infoWindow.Hide();
 		}
 
-		private void ZoomAtCenter(double zoomFactor)
-		{
+		private void ZoomAtCenter(double zoomFactor) {
 			if (DisplayImageControl.Source == null) return;
 
 			double centerX = ImageCanvas.ActualWidth / 2;
@@ -317,14 +296,34 @@ namespace fastly_image_viewer_net9
 			ClampPan();
 		}
 
-		private void zoomInBtn_Click(object sender, RoutedEventArgs e)
-		{
-			ZoomAtCenter(1.1);
+		private void ZoomInButton_Click(object sender, RoutedEventArgs e) => ZoomAtCenter(1.1);
+
+		private void ZoomOutButton_Click(object sender, RoutedEventArgs e) => ZoomAtCenter(0.9);
+
+		private void InactivityTimer_Tick(object? sender, EventArgs e) {
+			fadeOut.Begin(OpenButton);
+			fadeOut.Begin(SaveAsButton);
+			fadeOut.Begin(CloseButton);
+			fadeOut.Begin(ZoomInButton);
+			fadeOut.Begin(ZoomOutButton);
+			fadeOut.Begin(InfoButton);
+			isHidden = true;
+			inactivityTimer.Stop();
 		}
 
-		private void zoomOutBtn_Click(object sender, RoutedEventArgs e)
-		{
-			ZoomAtCenter(0.9);
+		private void Window_MouseMove(object sender, MouseEventArgs e) {
+			if (isHidden) {
+				fadeIn.Begin(OpenButton);
+				fadeIn.Begin(SaveAsButton);
+				fadeIn.Begin(CloseButton);
+				fadeIn.Begin(ZoomInButton);
+				fadeIn.Begin(ZoomOutButton);
+				fadeIn.Begin(InfoButton);
+				isHidden = false;
+			}
+
+			inactivityTimer.Stop();
+			inactivityTimer.Start();
 		}
 	}
 }

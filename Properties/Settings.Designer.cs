@@ -25,18 +25,6 @@ namespace fastly_image_viewer_net9.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1.1")]
-        public string Version {
-            get {
-                return ((string)(this["Version"]));
-            }
-            set {
-                this["Version"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool IsFirstRun {
             get {
@@ -104,6 +92,18 @@ namespace fastly_image_viewer_net9.Properties {
             }
             set {
                 this["Maximized"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1.2")]
+        public string Version {
+            get {
+                return ((string)(this["Version"]));
+            }
+            set {
+                this["Version"] = value;
             }
         }
     }

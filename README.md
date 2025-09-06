@@ -8,17 +8,17 @@ Forked for the sole purpose of creating a quick-to-develop, lightweight, image v
 ## To Do
   - [x] Rewrite the UI & controls;
   - [x] Expand zoom functionality: panning, clamping, zoom to pointer
-  - [ ] Installer / portable folder
+  - [x] Installer / portable folder
   - [x] Improve performance
  
 <br/>
 
 ## How to
  - **Modify & Build**: Clone the repo. Make sure you have *.NET Desktop Development* packages installed.
- - **Install**: Someday I'll provide an installer.
- - **In both cases, the final step**: right click on a .heic file > Properties. On the "Opens with:" section click on `Change ...` button. Browse for ***fastly-image-viewer-net9.exe*** and click OK. Now the app will open your .heic files!
+ - **Install**: Use the provided installer, it (at least I hope) should automatically associate .heic files (if not, check the next step).
+ - **In case the program was not associated to .heic**: right click on a .heic file > Properties. On the "Opens with:" section click on `Change ...` button. Browse for ***fastly-image-viewer-net9.exe*** and click OK. Now the app will open your .heic files!
  
-Target platforms: Windows 7 and above;
+Target platforms: Windows 7 and above; x64 only (can provide x86 if there is a demand)
 
 <br/>
 
